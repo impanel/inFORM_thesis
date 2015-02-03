@@ -51,9 +51,6 @@ apps/*
 xcuserdata
 *.xcworkspace
 
-#phil
-*.xcodeproj
-*.xcconfig
 
 # Code::Blocks
 *.depend
