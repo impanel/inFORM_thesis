@@ -88,6 +88,6 @@
 
 #define SEAN_SCREEN 1
 
-#define USE_KINECT 0
+#define USE_KINECT 1
 
 #endif

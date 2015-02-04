@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxSimpleGuiToo.h"
 #include "ReliefIOManager.h"
 #include "RenderableObject.h"
 #include "RWell.h"
