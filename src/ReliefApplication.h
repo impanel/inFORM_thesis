@@ -4,13 +4,7 @@
 #include "ofxSimpleGuiToo.h"
 #include "ReliefIOManager.h"
 #include "RenderableObject.h"
-#include "RWell.h"
-#include "RRectangle.h"
-#include "RBitmap.h"
-#include "KinectTracker.h"
-#include "RRipple.h"
 #include <memory>
-#include "R3DModel.h"
 #include "ofVideoGrabber.h"
 #include "RTCP.h"
 
@@ -54,9 +48,7 @@ public:
     vector< RenderableObject *> renderableObjects;
         
     RenderableObject * myCurrentRenderedObject;
-    
-    KinectTracker kinectTracker;
-        
+           
     ofShader mHeightMapShader;
     
     ofVideoGrabber cam;

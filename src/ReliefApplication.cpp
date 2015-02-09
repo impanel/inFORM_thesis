@@ -2,9 +2,6 @@
 
 //--------------------------------------------------------------
 void ReliefApplication::setup(){
-    if (USE_KINECT) {
-        kinectTracker.setup();
-    }
     
     ofSetLogLevel(OF_LOG_WARNING);
     
@@ -69,25 +66,11 @@ void ReliefApplication::setup(){
 
 //--------------------------------------------------------------
 void ReliefApplication::update(){
-
-    
-    if (USE_KINECT) {
-        kinectTracker.update();
-    }
-    
-    cam.update();
-    if(cam.isFrameNew()) {
-        camImage.setFromPixels(cam.getPixelsRef());
-    }
     
     //app timebase, to send to all animatable objets
 	float dt = 1.0f / ofGetFrameRate();
     
-    // update rendered objects
-    // myCurrentRenderedObject->update(dt);
-    //for(int i=0; i < renderableObjects.size(); i++){
-    //    renderableObjects[i]->update(dt);
-    //}
+    tcp.update(dt);
     
     renderGraphicsFBO();
     
@@ -97,39 +80,18 @@ void ReliefApplication::update(){
   
     sendHeightToRelief();
     
-    tcp.update(dt);
+    
 }
 
 //--------------------------------------------------------------
 
 void ReliefApplication::renderGraphicsFBO() {
     
-    // render graphics
+    //render graphics
     pinDisplayImage.begin();
-    // set up projection
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glViewport(0, 0, 900, 900);
-    glOrtho(0.0, 900, 0, 900, -500, 500);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glPushMatrix();
-    glTranslated(0, 0, -500);
-    glPopMatrix();
     
-    ofBackground(0);
-    
-    // draw 3d model
-    glEnable(GL_DEPTH_TEST);
-    
-    // draw the kinect image
-    ofPushMatrix();
-    ofTranslate(450, 450);
-    ofScale(mirrorMode*inputCanvasScale, inputCanvasScale);
-    ofRotateZ(inputCanvasRotation);
-    kinectTracker.drawGraphics(-750, -750, 2000, 1500);
-
-    ofPopMatrix();
+    ofClear(255,255,255, 0);
+    ofRect(0, 0, RELIEF_PROJECTOR_SIZE_X, RELIEF_PROJECTOR_SIZE_X);
     
     pinDisplayImage.end();
 }
@@ -140,27 +102,6 @@ void ReliefApplication::renderHeightMapFBO() {
     // ---- render large heightmap
     pinHeightMapImage.begin();
     
-//        // set up the projection
-//        glMatrixMode(GL_PROJECTION);
-//        glLoadIdentity();
-//        glViewport(0, 0, 900, 900);
-//        glOrtho(0.0, 900, 0, 900, -500, 500);
-//        glMatrixMode(GL_MODELVIEW);
-//        glLoadIdentity();
-//        glPushMatrix();
-//        glTranslated(0, 0, -500);
-//        glPopMatrix();
-//        
-//        ofBackground(0);
-//    
-//        // draw the kinect image
-//        ofPushMatrix();
-//            ofTranslate(450, 450);
-//            ofScale(mirrorMode*inputCanvasScale, inputCanvasScale);
-//            ofRotateZ(inputCanvasRotation);
-//            kinectTracker.drawDepth(-750, -750, 2000, 1500);
-//        ofPopMatrix();
-    //tcp.drawHeightMap();
     ofClear(255,255,255, 0);
     tcp.getPinHeightImage().draw(0, 0, RELIEF_PROJECTOR_SIZE_X, RELIEF_PROJECTOR_SIZE_X);
     
@@ -168,47 +109,12 @@ void ReliefApplication::renderHeightMapFBO() {
     
     // render small heightmap
     pinHeightMapImageSmall = tcp.getPinHeightImage();
-//    pinHeightMapImageSmall.begin();
-//        ofBackground(0);
-//        ofSetColor(255);
-//        pinHeightMapImage.draw(0, 0);
-//    pinHeightMapImageSmall.end();
 }
 
 //--------------------------------------------------------------
 
 void ReliefApplication::renderRemoteDisplayFBO() {
     
-    remoteDisplayFBO.begin();
-    // set up the projection
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glViewport(0, 0, CINTIQ_RESOLUTION_X, CINTIQ_RESOLUTION_Y);
-    glOrtho(0.0, CINTIQ_RESOLUTION_X, 0, CINTIQ_RESOLUTION_Y, -500, 500);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    //glPushMatrix();
-    //glTranslated(0, 0, -500);
-    //glPopMatrix();
-    
-    ofBackground(0,0,0);
-    
-    ofPushMatrix();
-    const float subX = 502;
-    const float subY = 166;
-    const float subWidth = 833-subX;
-    const float subHeight = 507-subY;
-
-        ofTranslate(CINTIQ_RESOLUTION_X/2, CINTIQ_RESOLUTION_Y/2);
-        ofRotateZ(-inputCanvasRotation);
-        ofScale(1.0f/inputCanvasScale, 1.0f/inputCanvasScale);
-        ofScale((CINTIQ_RESOLUTION_X/subWidth) * (15.0f/17.0f), (CINTIQ_RESOLUTION_Y/subHeight) * (15.0f/13.0f));
-        ofTranslate(-subWidth/2, -subHeight/2);
-        camImage.drawSubsection(0, 0, subWidth, subHeight, subX, subY, subWidth, subHeight);
-
-    ofPopMatrix();
-    
-    remoteDisplayFBO.end();
 }
 
 //--------------------------------------------------------------
@@ -227,19 +133,12 @@ void ReliefApplication::draw(){
     ofSetColor(255);
     ofRect(1009, 1, 502, 502);
     pinHeightMapImageSmall.draw(1010, 2, 500, 500);
-
-    ofSetColor(255);
-    ofRect(1, 506, 502, 502);
-    kinectTracker.drawDebugImage(2, 507, 500, 500);
     
     //Draw Graphics onto projector
     ofSetColor(255);
     pinDisplayImage.draw(projectorOffsetX, RELIEF_PROJECTOR_OFFSET_Y, RELIEF_PROJECTOR_SCALED_SIZE_X, RELIEF_PROJECTOR_SCALED_SIZE_Y);
     
-    remoteDisplayFBO.draw(SEAN_SCREEN_RESOLUTION_X + PROJECTOR_RAW_RESOLUTION_X, 0);
-    
-    //tcp.drawGraphics();
-    tcp.drawDebug(506, 506);
+    tcp.drawDebug(2, 506);
 }
 
 //--------------------------------------------------------------
@@ -260,24 +159,6 @@ void ReliefApplication::keyPressed(int key){
     if(key == 'r') {
         inputCanvasScale = 1;
         inputCanvasRotation = 0;
-    }
-    if (key == 'a') {
-        kinectTracker.addSnapshot();
-    }
-    if (key == 's') {
-        kinectTracker.removeSnapshot();
-    }
-    if (key == '1') {
-        kinectTracker.switchToNextVisualization();
-    }
-    if (key == '2') {
-        kinectTracker.switchToPreviousVisualization();
-    }
-    if (key == '3') {
-        kinectTracker.toggleDepthRendering();
-    }
-    if (key == 'm'){
-        mirrorMode= -1* mirrorMode;
     }
     
     tcp.keyPressed(key);
@@ -348,9 +229,6 @@ void ReliefApplication::sendHeightToRelief(){
 
 //------------------------------------------------------------
 void ReliefApplication::exit(){
-    if (USE_KINECT) {
-        kinectTracker.exit();
-    }
     mIOManager->sendValueToAllBoards(TERM_ID_MAXSPEED, (unsigned char) 0);
     ofSleepMillis(1000);
 }
