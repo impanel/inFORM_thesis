@@ -52,33 +52,8 @@ void ReliefApplication::setup(){
     remoteDisplayFBO.allocate(CINTIQ_RESOLUTION_X, CINTIQ_RESOLUTION_Y, GL_RGBA);
     
     
-    myRipple = new RRipple();
-    myRipple->setPosition(ofPoint(450,450));
-    myRipple->setSize(ofPoint(650,650));
-    myRipple->render = true;
-    
-    
-    bool loadPlane = false;
-    
-    if (loadPlane) {
-        model.loadModel("plane/plane.3ds", 18);
-        model.setRotation(0, -5, 1, 0, 0); // plane
-        model.setRotation(1, 29, 0, 0, 1); // plane
-        model.setPosition(435, 420, -400); // plane
-    }
-    else {
-        model.loadModel("VWBeetle/VWBeetle.3ds", 0.099);
-        model.setScale(1,1,1);
-        model.setPosition(470, 520, -250);
-        model.setRotation(1, 230, 0, 0, 1);
-    }
-    
-    //model.loadModel("plane/plane.3ds", 18); // plant
-    
     mHeightMapShader.load("shaders/heightMapShader");
-    
-    show3DModel = false;
-    
+   
     
     cam.setDeviceID(2);
 
@@ -88,6 +63,7 @@ void ReliefApplication::setup(){
     
     mirrorMode = 1;
     
+    tcp.setup();
     
 }
 
@@ -120,8 +96,11 @@ void ReliefApplication::update(){
     renderRemoteDisplayFBO();
   
     sendHeightToRelief();
+    
+    tcp.update(dt);
 }
 
+//--------------------------------------------------------------
 
 void ReliefApplication::renderGraphicsFBO() {
     
@@ -142,14 +121,6 @@ void ReliefApplication::renderGraphicsFBO() {
     
     // draw 3d model
     glEnable(GL_DEPTH_TEST);
-    if(show3DModel) model.draw();
-    glDisable(GL_DEPTH_TEST);
-    
-    ///kinectTracker.drawColorImage(-300, -300, 2000, 1500);
-    //ofPushMatrix();         // push the current coordinate position
-    //ofRotateZ(20);
-    //kinectTracker.drawColorImage(-300, -300, 2000, 1500);
-    //ofPopMatrix();
     
     // draw the kinect image
     ofPushMatrix();
@@ -157,53 +128,54 @@ void ReliefApplication::renderGraphicsFBO() {
     ofScale(mirrorMode*inputCanvasScale, inputCanvasScale);
     ofRotateZ(inputCanvasRotation);
     kinectTracker.drawGraphics(-750, -750, 2000, 1500);
+
     ofPopMatrix();
-    
     
     pinDisplayImage.end();
 }
+
+//--------------------------------------------------------------
 
 void ReliefApplication::renderHeightMapFBO() {
     // ---- render large heightmap
     pinHeightMapImage.begin();
     
-        // set up the projection
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glViewport(0, 0, 900, 900);
-        glOrtho(0.0, 900, 0, 900, -500, 500);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        glPushMatrix();
-        glTranslated(0, 0, -500);
-        glPopMatrix();
-        
-        ofBackground(0);
-        
-        // draw the 3D model
-        mHeightMapShader.begin();
-        glEnable(GL_DEPTH_TEST);
-        if(show3DModel) model.draw();
-        glDisable(GL_DEPTH_TEST);
-        mHeightMapShader.end();
-        
-        // draw the kinect image
-        ofPushMatrix();
-            ofTranslate(450, 450);
-            ofScale(mirrorMode*inputCanvasScale, inputCanvasScale);
-            ofRotateZ(inputCanvasRotation);
-            kinectTracker.drawDepth(-750, -750, 2000, 1500);
-        ofPopMatrix();
+//        // set up the projection
+//        glMatrixMode(GL_PROJECTION);
+//        glLoadIdentity();
+//        glViewport(0, 0, 900, 900);
+//        glOrtho(0.0, 900, 0, 900, -500, 500);
+//        glMatrixMode(GL_MODELVIEW);
+//        glLoadIdentity();
+//        glPushMatrix();
+//        glTranslated(0, 0, -500);
+//        glPopMatrix();
+//        
+//        ofBackground(0);
+//    
+//        // draw the kinect image
+//        ofPushMatrix();
+//            ofTranslate(450, 450);
+//            ofScale(mirrorMode*inputCanvasScale, inputCanvasScale);
+//            ofRotateZ(inputCanvasRotation);
+//            kinectTracker.drawDepth(-750, -750, 2000, 1500);
+//        ofPopMatrix();
+    //tcp.drawHeightMap();
+    ofClear(255,255,255, 0);
+    tcp.getPinHeightImage().draw(0, 0, RELIEF_PROJECTOR_SIZE_X, RELIEF_PROJECTOR_SIZE_X);
     
     pinHeightMapImage.end();
     
     // render small heightmap
-    pinHeightMapImageSmall.begin();
-        ofBackground(0);
-        ofSetColor(255);
-        pinHeightMapImage.draw(0, 0, RELIEF_SIZE_X, RELIEF_SIZE_Y);
-    pinHeightMapImageSmall.end();
+    pinHeightMapImageSmall = tcp.getPinHeightImage();
+//    pinHeightMapImageSmall.begin();
+//        ofBackground(0);
+//        ofSetColor(255);
+//        pinHeightMapImage.draw(0, 0);
+//    pinHeightMapImageSmall.end();
 }
+
+//--------------------------------------------------------------
 
 void ReliefApplication::renderRemoteDisplayFBO() {
     
@@ -243,7 +215,7 @@ void ReliefApplication::renderRemoteDisplayFBO() {
 void ReliefApplication::draw(){
     
     // draw debug graphics
-    ofBackground(0,0,0);
+    ofBackground(128,128,128);
     ofSetColor(255);
     ofRect(1, 1, 502, 502);
     pinDisplayImage.draw(2, 2, 500, 500);
@@ -251,7 +223,6 @@ void ReliefApplication::draw(){
     ofSetColor(255);
     ofRect(505, 1, 502, 502);
     pinHeightMapImage.draw(506, 2, 500, 500);
-    
     
     ofSetColor(255);
     ofRect(1009, 1, 502, 502);
@@ -265,9 +236,10 @@ void ReliefApplication::draw(){
     ofSetColor(255);
     pinDisplayImage.draw(projectorOffsetX, RELIEF_PROJECTOR_OFFSET_Y, RELIEF_PROJECTOR_SCALED_SIZE_X, RELIEF_PROJECTOR_SCALED_SIZE_Y);
     
-
     remoteDisplayFBO.draw(SEAN_SCREEN_RESOLUTION_X + PROJECTOR_RAW_RESOLUTION_X, 0);
     
+    //tcp.drawGraphics();
+    tcp.drawDebug(506, 506);
 }
 
 //--------------------------------------------------------------
@@ -307,9 +279,8 @@ void ReliefApplication::keyPressed(int key){
     if (key == 'm'){
         mirrorMode= -1* mirrorMode;
     }
-    if (key == 'b'){
-        show3DModel= !show3DModel;
-    }
+    
+    tcp.keyPressed(key);
 }
 
 //--------------------------------------------------------------

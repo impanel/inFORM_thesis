@@ -12,6 +12,7 @@
 #include <memory>
 #include "R3DModel.h"
 #include "ofVideoGrabber.h"
+#include "RTCP.h"
 
 //#define RECTDRAW_SIZE 10
 //#define DRAW_OFFSET 300
@@ -51,20 +52,16 @@ public:
     int projectorOffsetX;
     
     vector< RenderableObject *> renderableObjects;
-    
-    RRipple * myRipple;
-    
+        
     RenderableObject * myCurrentRenderedObject;
     
     KinectTracker kinectTracker;
         
-    ofx3DModelLoader model;
     ofShader mHeightMapShader;
     
     ofVideoGrabber cam;
     ofImage camImage;
-    
-    bool show3DModel;
+    RTCP    tcp;
     
     float inputCanvasRotation = 0;
     float inputCanvasScale = 1;
