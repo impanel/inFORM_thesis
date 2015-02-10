@@ -37,7 +37,7 @@ void RTCP::setup(){
     bPause = false;
     sequenceFPS = 30;
     
-    pinHeightImage.allocate(RELIEF_SIZE_X, RELIEF_SIZE_Y, GL_RGB);
+    pinHeightImage.allocate(RELIEF_SIZE_X, RELIEF_SIZE_Y, GL_RGBA);
 }
 
 //--------------------------------------------------------------
@@ -205,16 +205,18 @@ void RTCP::clearFrames()
 
 void RTCP::keyPressed(int key)
 {
-    //clear frame arra
-    if (key == 'c')
+    //clear frame array
+    if(key == 'c')
+    {
         bStop = true;
         frameIndex = 0;
         for(int i = 0; i < size; i++)
             pixels[i] = 0;
         storeText.clear();
+    }
     
-    //toggle pause
-    if (key == ' ') 
+    //toggle pause/play
+    if(key == ' ')
     {
         bPause = !bPause;
         bStop = false;
@@ -228,17 +230,31 @@ void RTCP::keyPressed(int key)
             cout<<"play"<<endl;
             elapsedTime = ofGetElapsedTimef() - pauseTime;
         }
-
     }
     
     //toggle stop
-    if (key == 'z') 
+    if(key == 'z')
     {
         //stop
         bStop = !bStop;
         bPause = false;
         elapsedTime = ofGetElapsedTimef();
     }
+    
+    //advance single frame
+    if(key == OF_KEY_RIGHT)
+    {
+        if (frameIndex != storeText.size())
+            frameIndex++;
+    }
+    
+    //rewind single frame
+    if(key == OF_KEY_LEFT)
+    {
+        if (frameIndex != 0)
+            frameIndex--;
+    }
+    
 }
 
 //--------------------------------------------------------------

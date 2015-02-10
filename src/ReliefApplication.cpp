@@ -109,6 +109,14 @@ void ReliefApplication::renderHeightMapFBO() {
     
     // render small heightmap
     pinHeightMapImageSmall = tcp.getPinHeightImage();
+    
+//    pinHeightMapImageSmall.begin();
+//    ofSetColor(0, 0, 0);
+//    ofRect(0, 0, 30, 30);
+//    ofSetColor(128);
+//    ofRect(0, 0, 15, 15);
+//    pinHeightMapImageSmall.end();
+//    
 }
 
 //--------------------------------------------------------------
