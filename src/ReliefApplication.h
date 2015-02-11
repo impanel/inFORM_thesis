@@ -6,7 +6,9 @@
 #include "RenderableObject.h"
 #include <memory>
 #include "ofVideoGrabber.h"
+#include "ofxUI.h"
 #include "RTCP.h"
+#include "RMovie.h"
 
 //#define RECTDRAW_SIZE 10
 //#define DRAW_OFFSET 300
@@ -34,6 +36,9 @@ public:
     void renderRemoteDisplayFBO();
     void sendHeightToRelief();
     
+    void setupVideosDropdown();
+    void guiEvent(ofxUIEventArgs &e);
+    
     ReliefIOManager * mIOManager;
 	unsigned char mPinHeightToRelief [RELIEF_SIZE_X][RELIEF_SIZE_Y];
     
@@ -54,8 +59,13 @@ public:
     ofVideoGrabber cam;
     ofImage camImage;
     RTCP    tcp;
+    RMovie  movie;
+    bool bUseVideo;
     
     float inputCanvasRotation = 0;
     float inputCanvasScale = 1;
     int mirrorMode = 1;
+    
+    //UI
+    ofxUICanvas *videosDropdown;
 };

@@ -62,6 +62,29 @@ void ReliefApplication::setup(){
     
     tcp.setup();
     
+    movie.setup("videos");
+    setupVideosDropdown();
+    
+    bUseVideo = true;
+    
+}
+
+//--------------------------------------------------------------
+
+void ReliefApplication::setupVideosDropdown()
+{
+    videosDropdown = new ofxUICanvas;
+    videosDropdown->setPosition(506, 506);
+    videosDropdown->setName("Videos");
+    videosDropdown->addLabel("Videos");
+    
+    //Dropdown Menu for Videos
+    ofxUIDropDownList *ddl = videosDropdown->addDropDownList("video list", movie.getLoadedVideoFilenames());
+    ddl->setAllowMultiple(false);
+    ddl->setAutoClose(true);
+    
+    ofAddListener(videosDropdown->newGUIEvent, this, &ReliefApplication::guiEvent);
+    videosDropdown->autoSizeToFitWidgets();
 }
 
 //--------------------------------------------------------------
@@ -70,7 +93,11 @@ void ReliefApplication::update(){
     //app timebase, to send to all animatable objets
 	float dt = 1.0f / ofGetFrameRate();
     
-    tcp.update(dt);
+    if(bUseVideo)
+        movie.update(dt);
+    else
+        tcp.update(dt);
+
     
     renderGraphicsFBO();
     
@@ -91,7 +118,7 @@ void ReliefApplication::renderGraphicsFBO() {
     pinDisplayImage.begin();
     
     ofClear(255,255,255, 0);
-    ofRect(0, 0, RELIEF_PROJECTOR_SIZE_X, RELIEF_PROJECTOR_SIZE_X);
+    ofRect(0, 0, RELIEF_PROJECTOR_SIZE_X, RELIEF_PROJECTOR_SIZE_Y);
     
     pinDisplayImage.end();
 }
@@ -103,20 +130,20 @@ void ReliefApplication::renderHeightMapFBO() {
     pinHeightMapImage.begin();
     
     ofClear(255,255,255, 0);
-    tcp.getPinHeightImage().draw(0, 0, RELIEF_PROJECTOR_SIZE_X, RELIEF_PROJECTOR_SIZE_X);
+    
+    if (bUseVideo)
+        movie.getPinHeightImage().draw(0, 0, RELIEF_PROJECTOR_SIZE_X, RELIEF_PROJECTOR_SIZE_X);
+        //movie.drawHeightMap();
+    else
+        tcp.getPinHeightImage().draw(0, 0, RELIEF_PROJECTOR_SIZE_X, RELIEF_PROJECTOR_SIZE_X);
     
     pinHeightMapImage.end();
     
     // render small heightmap
-    pinHeightMapImageSmall = tcp.getPinHeightImage();
-    
-//    pinHeightMapImageSmall.begin();
-//    ofSetColor(0, 0, 0);
-//    ofRect(0, 0, 30, 30);
-//    ofSetColor(128);
-//    ofRect(0, 0, 15, 15);
-//    pinHeightMapImageSmall.end();
-//    
+    if (bUseVideo)
+        pinHeightMapImageSmall = movie.getPinHeightImage();
+    else
+        pinHeightMapImageSmall = tcp.getPinHeightImage();
 }
 
 //--------------------------------------------------------------
@@ -128,7 +155,6 @@ void ReliefApplication::renderRemoteDisplayFBO() {
 //--------------------------------------------------------------
 void ReliefApplication::draw(){
     
-    // draw debug graphics
     ofBackground(128,128,128);
     ofSetColor(255);
     ofRect(1, 1, 502, 502);
@@ -146,7 +172,14 @@ void ReliefApplication::draw(){
     ofSetColor(255);
     pinDisplayImage.draw(projectorOffsetX, RELIEF_PROJECTOR_OFFSET_Y, RELIEF_PROJECTOR_SCALED_SIZE_X, RELIEF_PROJECTOR_SCALED_SIZE_Y);
     
-    tcp.drawDebug(2, 506);
+    // draw debug graphics
+    if(bUseVideo)
+        movie.drawDebug(2, 506);
+    else
+        tcp.drawDebug(2, 506);
+    
+    ofDrawBitmapString(ofToString(ofGetFrameRate()), 10, ofGetHeight() - 30);
+
 }
 
 //--------------------------------------------------------------
@@ -169,7 +202,10 @@ void ReliefApplication::keyPressed(int key){
         inputCanvasRotation = 0;
     }
     
-    tcp.keyPressed(key);
+    if (bUseVideo)
+        movie.keyPressed(key);
+    else
+        tcp.keyPressed(key);
 }
 
 //--------------------------------------------------------------
@@ -209,6 +245,26 @@ void ReliefApplication::windowResized(int w, int h){
 //--------------------------------------------------------------
 void ReliefApplication::gotMessage(ofMessage msg){
     
+}
+
+//------------------------------------------------------------
+void ReliefApplication::guiEvent(ofxUIEventArgs &e)
+{
+    //cout << "Event fired: " << e.getName() << endl;
+    if(e.getName() == "video list")
+    {
+        ofxUIDropDownList *ddlist = (ofxUIDropDownList *) e.widget;
+        vector<ofxUIWidget *> &selected = ddlist->getSelected();
+        for(int i = 0; i < selected.size(); i++)
+        {
+            cout << "SELECTED VIDEO: " << selected[i]->getName() << endl;
+            movie.playByFilename(selected[i]->getName());
+            movie.reset();
+            movie.setLooping(true);
+            movie.resume();
+            cout<<"play"<<endl;
+        }
+    }
 }
 
 //-----------------------------------------------------------
