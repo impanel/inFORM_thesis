@@ -21,7 +21,7 @@ void RTCP::setup(){
     pixels = new unsigned char[size];
     
     //setup the server to listen on 11999
-    TCP.setup(11989);
+    TCP.setup(11991);
     TCP.setMessageDelimiter("\n");
     
     //fill the vector<>
@@ -244,7 +244,7 @@ void RTCP::keyPressed(int key)
     //advance single frame
     if(key == OF_KEY_RIGHT)
     {
-        if (frameIndex != storeText.size())
+        if (frameIndex < storeText.size() - 1)
             frameIndex++;
     }
     

@@ -65,7 +65,7 @@ void ReliefApplication::setup(){
     movie.setup("videos");
     setupVideosDropdown();
     
-    bUseVideo = true;
+    bUseVideo = false;
     
 }
 
@@ -185,6 +185,16 @@ void ReliefApplication::draw(){
 //--------------------------------------------------------------
 void ReliefApplication::keyPressed(int key){
     //myCurrentRenderedObject->keyPressed(key);
+    
+    //Activate TCP
+    if(key == '1') {
+        bUseVideo = false;
+    }
+    
+    //Activate Video
+    if(key == '2') {
+        bUseVideo = true;
+    }
     
     if(key == '0') {
         inputCanvasRotation += 3;
