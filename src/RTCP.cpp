@@ -21,7 +21,7 @@ void RTCP::setup(){
     pixels = new unsigned char[size];
     
     //setup the server to listen on 11999
-    TCP.setup(11991);
+    TCP.setup(11995);
     TCP.setMessageDelimiter("\n");
     
     //fill the vector<>
@@ -34,8 +34,12 @@ void RTCP::setup(){
     }
     
     bStop = true;
-    bPause = false;
+    bPause = true;
+    bErrorDetected = false;
+    bMentionError = false;
     sequenceFPS = 30;
+    oldCheckSum = 999999;
+    frameIndex = 0;
     
     pinHeightImage.allocate(RELIEF_SIZE_X, RELIEF_SIZE_Y, GL_RGBA);
 }
@@ -114,6 +118,18 @@ void RTCP::drawDebug(int _x, int _y)
         //draw the info text and the received text bellow it
         ofDrawBitmapString(info, xPos, yPos);
         ofDrawBitmapString(storeInfo, xPos, yPos + 35);
+        
+        if(bPause)
+        {
+            string paused = "PLAYBACK PAUSED";
+            ofDrawBitmapString(paused, xPos, yPos + 70);
+        }
+        
+        if(bMentionError)
+        {
+            string errorMsg = "ERROR in received data: please clear array [c]";
+            ofDrawBitmapString(errorMsg, xPos, yPos + 105);
+        }
     }
 }
 
@@ -150,29 +166,74 @@ void RTCP::drawPins(unsigned char * _theColors)
     pinHeightImage.begin();
     ofClear(255,255,255, 0);
     
-    //sort incoming data
-    for(int i = 0; i < columns; i++) // columns
+    if (!checkForErrors())
     {
-        for(int j = 0; j < rows; j++) // rows
+    //sort incoming data
+        for(int i = 0; i < columns; i++) // columns
         {
-            //2D to 1D array
-            int idx = i * columns +j; 
+            for(int j = 0; j < rows; j++) // rows
+            {
+                //2D to 1D array
+                int idx = i * columns +j;
             
-            rects.at(idx).setWidth(1);
-            rects.at(idx).setHeight(1);
+                rects.at(idx).setWidth(1);
+                rects.at(idx).setHeight(1);
             
-            rects.at(idx).x = i*1;
-            rects.at(idx).y = j*1;
+                rects.at(idx).x = i*1;
+                rects.at(idx).y = j*1;
             
-            ofSetColor(_theColors[idx]);
+                ofSetColor(_theColors[idx]);
             
-            //draw values in sorted order
-            ofRect(rects.at(idx));
-            //cout<<idx << " : " <<(int)_theColors[idx]<<endl;
+                //draw values in sorted order
+                ofRect(rects.at(idx));
+                //cout<<idx << " : " <<(int)_theColors[idx]<<endl;
+            }
         }
+    }
+    else
+    {
+        ofSetColor(0, 0, 0);
+        ofRect(0, 0, RELIEF_SIZE_X, RELIEF_SIZE_Y);
     }
     
     pinHeightImage.end();
+}
+
+//--------------------------------------------------------------
+
+bool RTCP::checkForErrors() //method to check if any noise data was received (which unfortuntelly happens sometimes)
+{
+    //TODO
+    int currentCheckSum = 0;
+    
+    for(int i = 0; i < size; i++)
+    {
+        currentCheckSum += pixels[i]; //add all the 8-bit values
+    }
+    
+    //cout<<currentCheckSum<<endl;
+    
+    //if a sudden change happens we can assume it's an error
+    if (currentCheckSum > oldCheckSum + 100000)
+    {
+        bMentionError = true;
+        bErrorDetected = true;
+        cout<<"ERROR: received frame probably false"<<endl;
+        oldCheckSum = currentCheckSum;
+        //delete the false frame from collection
+        storeText.erase(storeText.end());
+        return true;
+    }
+    else if(bErrorDetected && oldCheckSum == currentCheckSum) //for all following false frames do the same
+    {
+        storeText.erase(storeText.end());
+        return true;
+    }
+    
+    //if no error detected
+    bErrorDetected = false;
+    oldCheckSum = currentCheckSum;
+    return false;
 }
 
 //--------------------------------------------------------------
@@ -213,6 +274,7 @@ void RTCP::keyPressed(int key)
         for(int i = 0; i < size; i++)
             pixels[i] = 0;
         storeText.clear();
+        bMentionError = false;
     }
     
     //toggle pause/play
@@ -224,6 +286,10 @@ void RTCP::keyPressed(int key)
         {
             cout<<"pause"<<endl;
             pauseTime = ofGetElapsedTimef() - elapsedTime;
+            if(frameIndex == 0)
+            {
+                //frameIndex = 1; //makes sure we can collect data without it playing back TODO
+            }
         }
         else
         {
@@ -233,12 +299,19 @@ void RTCP::keyPressed(int key)
     }
     
     //toggle stop
-    if(key == 'z')
+    if(key == 's')
     {
         //stop
         bStop = !bStop;
         bPause = false;
         elapsedTime = ofGetElapsedTimef();
+    }
+    
+    //toggle stop
+    if(key == 'd')
+    {
+        //delete current frame from vector
+        storeText.erase(storeText.begin() + frameIndex);
     }
     
     //advance single frame
@@ -262,4 +335,12 @@ void RTCP::keyPressed(int key)
 ofFbo RTCP::getPinHeightImage()
 {
     return pinHeightImage;
+}
+
+//--------------------------------------------------------------
+
+void RTCP::exit()
+{
+    TCP.disconnectClient(0);
+    TCP.close();
 }

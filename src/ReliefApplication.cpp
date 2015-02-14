@@ -303,6 +303,7 @@ void ReliefApplication::sendHeightToRelief(){
 
 //------------------------------------------------------------
 void ReliefApplication::exit(){
+    tcp.exit();
     mIOManager->sendValueToAllBoards(TERM_ID_MAXSPEED, (unsigned char) 0);
     ofSleepMillis(1000);
 }
