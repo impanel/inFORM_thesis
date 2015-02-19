@@ -21,7 +21,7 @@ void RTCP::setup(){
     pixels = new unsigned char[size];
     
     //setup the server to listen on 11999
-    TCP.setup(11995);
+    TCP.setup(11998);
     TCP.setMessageDelimiter("\n");
     
     //fill the vector<>
@@ -221,12 +221,14 @@ bool RTCP::checkForErrors() //method to check if any noise data was received (wh
         cout<<"ERROR: received frame probably false"<<endl;
         oldCheckSum = currentCheckSum;
         //delete the false frame from collection
-        storeText.erase(storeText.end());
+        if(storeText.size() != 0)
+            storeText.erase(storeText.end());
         return true;
     }
     else if(bErrorDetected && oldCheckSum == currentCheckSum) //for all following false frames do the same
     {
-        storeText.erase(storeText.end());
+        if(storeText.size() != 0)
+            storeText.erase(storeText.end());
         return true;
     }
     
