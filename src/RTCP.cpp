@@ -95,9 +95,9 @@ void RTCP::drawGraphics()
 
 //--------------------------------------------------------------
 
-void RTCP::drawDebug(int _x, int _y)
+void RTCP::drawDebug(int _x, int _y, int _w, int _h)
 {
-    pinHeightImage.draw(_x, _y, 500, 500);
+    pinHeightImage.draw(_x, _y, _w, _h);
     
     //draw info about TCP
     if(TCP.isClientConnected(0))

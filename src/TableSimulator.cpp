@@ -45,6 +45,8 @@ void TableSimulator::drawInteractionArea(int px, int py, int w, int h){
 	ofSetColor(255, 255, 0);
 	ofNoFill();
 	glDepthMask(false);
+	ofSetCircleResolution(100);
+	ofEnableSmoothing();
 	ofCircle(px+x, py+y, r);
 	glDepthMask(true);
 	ofPopStyle();

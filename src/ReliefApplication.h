@@ -14,6 +14,7 @@
 //#define RECTDRAW_SIZE 10
 //#define DRAW_OFFSET 300
 //#define MID_PIN_HEIGHT 127
+//#define DRAW_SCREEN_HALF_SIZE
 
 class ReliefApplication : public ofBaseApp {
 public:
@@ -37,7 +38,7 @@ public:
     void renderRemoteDisplayFBO();
     void sendHeightToRelief();
     
-    void setupVideosDropdown();
+    void setupGuiMenu();
     void guiEvent(ofxUIEventArgs &e);
     
     ReliefIOManager * mIOManager;
@@ -62,12 +63,20 @@ public:
     RTCP    tcp;
     RMovie  movie;
     bool bUseVideo;
+    bool drawTableSimulation = true;
+
+    int gridOffset0 = 2;
+    int gridOffset1 = 506;
+    int gridOffset2 = 1010;
+    int gridSize = 500;
+    int simulationZoom = 4;
     
     float inputCanvasRotation = 0;
     float inputCanvasScale = 1;
     int mirrorMode = 1;
     
     //UI
+    ofxUICanvas *guiMenu;
+    ofxUICanvas *simulationToggle;
     TableSimulator *tableSimulation;
-    ofxUICanvas *videosDropdown;
 };

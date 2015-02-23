@@ -23,7 +23,15 @@ void ReliefApplication::setup(){
         projectorOffsetX=DANIEL_SCREEN_RESOLUTION_X+RELIEF_PROJECTOR_OFFSET_X;
         ofSetWindowPosition(0, 0);
     }
-    
+
+    #ifdef DRAW_SCREEN_HALF_SIZE
+        gridOffset0 /= 2;
+        gridOffset1 /= 2;
+        gridOffset2 /= 2;
+        gridSize /= 2;
+        simulationZoom /= 2;
+    #endif
+
     ofSetFrameRate(30);
     
 	// initialize communication with Relief table
@@ -66,31 +74,34 @@ void ReliefApplication::setup(){
     tcp.setup();
     
     movie.setup("videos");
-    setupVideosDropdown();
-    
+    setupGuiMenu();
+
     bUseVideo = false;
     
 }
 
 //--------------------------------------------------------------
 
-void ReliefApplication::setupVideosDropdown()
+void ReliefApplication::setupGuiMenu()
 {
-    videosDropdown = new ofxUICanvas;
-    videosDropdown->setPosition(506, 506);
-    videosDropdown->setName("Videos");
-    videosDropdown->addLabel("Videos");
+    guiMenu = new ofxUICanvas;
+    guiMenu->setPosition(gridOffset1, gridOffset1);
+    guiMenu->setName("GUI Menu");
+
+    //Toggle for Table Simulation
+    guiMenu->addToggle("show simulation", &drawTableSimulation);
     
     //Dropdown Menu for Videos
-    ofxUIDropDownList *ddl = videosDropdown->addDropDownList("video list", movie.getLoadedVideoFilenames());
+    ofxUIDropDownList *ddl = guiMenu->addDropDownList("video list", movie.getLoadedVideoFilenames());
     ddl->setAllowMultiple(false);
     ddl->setAutoClose(true);
     
-    ofAddListener(videosDropdown->newGUIEvent, this, &ReliefApplication::guiEvent);
-    videosDropdown->autoSizeToFitWidgets();
+    ofAddListener(guiMenu->newGUIEvent, this, &ReliefApplication::guiEvent);
+    guiMenu->autoSizeToFitWidgets();
 }
 
 //--------------------------------------------------------------
+
 void ReliefApplication::update(){
     
     //app timebase, to send to all animatable objets
@@ -158,37 +169,37 @@ void ReliefApplication::renderRemoteDisplayFBO() {
 
 //--------------------------------------------------------------
 void ReliefApplication::draw(){
-    
-    ofBackground(128,128,128);
+    ofBackground(128, 128, 128);
     ofSetColor(255);
-    ofRect(1, 1, 502, 502);
-    pinDisplayImage.draw(2, 2, 500, 500);
-    
-    ofSetColor(255);
-    ofRect(505, 1, 502, 502);
-    pinHeightMapImage.draw(506, 2, 500, 500);
+    ofRect(gridOffset0 - 1, gridOffset0 - 1, gridSize + 2, gridSize + 2);
+    pinDisplayImage.draw(gridOffset0, gridOffset0, gridSize, gridSize);
     
     ofSetColor(255);
-    ofRect(1009, 1, 502, 502);
-    pinHeightMapImageSmall.draw(1010, 2, 500, 500);
+    ofRect(gridOffset1 - 1, gridOffset0 - 1, gridSize + 2, gridSize + 2);
+    pinHeightMapImage.draw(gridOffset1, gridOffset0, gridSize, gridSize);
+    
+    ofSetColor(255);
+    ofRect(gridOffset2 - 1, gridOffset0 - 1, gridSize + 2, gridSize + 2);
+    pinHeightMapImageSmall.draw(gridOffset2, gridOffset0, gridSize, gridSize);
     
     //Draw Graphics onto projector
     ofSetColor(255);
     pinDisplayImage.draw(projectorOffsetX, RELIEF_PROJECTOR_OFFSET_Y, RELIEF_PROJECTOR_SCALED_SIZE_X, RELIEF_PROJECTOR_SCALED_SIZE_Y);
-
+    
     // draw simulation in all views if we want
     // be careful as this slows performance
-    tableSimulation->drawTableCamView(400, 320, 600, 600, 4);
-    tableSimulation->drawInteractionArea(400, 320, 600, 600);
-
+    if(drawTableSimulation) {
+        tableSimulation->drawTableCamView(gridOffset2 - 1, gridOffset1, gridSize + 2, gridSize + 2, simulationZoom);
+        tableSimulation->drawInteractionArea(gridOffset2, gridOffset1, gridSize, gridSize);
+    }
+    
     // draw debug graphics
     if(bUseVideo)
-        movie.drawDebug(2, 506);
+        movie.drawDebug(gridOffset0, gridOffset1);
     else
-        tcp.drawDebug(2, 506);
+        tcp.drawDebug(gridOffset0, gridOffset1, gridSize, gridSize);
     
     ofDrawBitmapString(ofToString(ofGetFrameRate()), 10, ofGetHeight() - 30);
-
 }
 
 //--------------------------------------------------------------

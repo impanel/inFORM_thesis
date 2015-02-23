@@ -26,7 +26,7 @@ public:
     void drawPinsDebug(unsigned char * _theColors);
     void drawPins(unsigned char * _theColors);
     
-    void drawDebug(int _x, int _y);
+    void drawDebug(int _x, int _y, int _w, int _h);
     
     void togglePlay();
     void togglePause();
