@@ -214,19 +214,13 @@ bool RTCP::checkForErrors() //method to check if any noise data was received (wh
     //cout<<currentCheckSum<<endl;
     
     //if a sudden change happens we can assume it's an error
-    if (currentCheckSum > oldCheckSum + 100000)
+    if (currentCheckSum > oldCheckSum + 90000 ||  (bErrorDetected && oldCheckSum == currentCheckSum) || (bErrorDetected && currentCheckSum != 0))
     {
         bMentionError = true;
         bErrorDetected = true;
         cout<<"ERROR: received frame probably false"<<endl;
         oldCheckSum = currentCheckSum;
         //delete the false frame from collection
-        if(storeText.size() != 0)
-            storeText.erase(storeText.end());
-        return true;
-    }
-    else if(bErrorDetected && oldCheckSum == currentCheckSum) //for all following false frames do the same
-    {
         if(storeText.size() != 0)
             storeText.erase(storeText.end());
         return true;
