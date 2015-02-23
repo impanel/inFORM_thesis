@@ -43,6 +43,10 @@ private:
 public:
 	ReliefIOManager();
 	~ReliefIOManager();
+
+    // the array that stores the pin display height values
+    unsigned char pinHeightToRelief [RELIEF_SIZE_X][RELIEF_SIZE_Y];
+
 	void sendPinHeightToRelief(unsigned char pPinHeightToRelief [RELIEF_SIZE_X][RELIEF_SIZE_Y]);
 	void sendValueToAllBoards(unsigned char termId, unsigned char value);
 	void sendValuesToBoard(unsigned char termId, unsigned char boardId, unsigned char value[NUM_PINS_ARDUINO], int serialConnection);

@@ -4,6 +4,7 @@
 #include "ofxSimpleGuiToo.h"
 #include "ReliefIOManager.h"
 #include "RenderableObject.h"
+#include "TableSimulator.h"
 #include <memory>
 #include "ofVideoGrabber.h"
 #include "ofxUI.h"
@@ -67,5 +68,6 @@ public:
     int mirrorMode = 1;
     
     //UI
+    TableSimulator *tableSimulation;
     ofxUICanvas *videosDropdown;
 };

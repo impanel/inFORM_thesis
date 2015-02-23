@@ -29,6 +29,9 @@ void ReliefApplication::setup(){
 	// initialize communication with Relief table
 	mIOManager = new ReliefIOManager();
     
+    // table simulator
+    tableSimulation = new TableSimulator(mIOManager);
+    
     float gain_P = 1.3;
     float gain_I = 0.2;
     int max_I = 60;
@@ -107,7 +110,8 @@ void ReliefApplication::update(){
   
     sendHeightToRelief();
     
-    
+    // update the table simulation, which is the rendered table graphic
+    tableSimulation->update();
 }
 
 //--------------------------------------------------------------
@@ -171,7 +175,12 @@ void ReliefApplication::draw(){
     //Draw Graphics onto projector
     ofSetColor(255);
     pinDisplayImage.draw(projectorOffsetX, RELIEF_PROJECTOR_OFFSET_Y, RELIEF_PROJECTOR_SCALED_SIZE_X, RELIEF_PROJECTOR_SCALED_SIZE_Y);
-    
+
+    // draw simulation in all views if we want
+    // be careful as this slows performance
+    tableSimulation->drawTableCamView(400, 320, 600, 600, 4);
+    tableSimulation->drawInteractionArea(400, 320, 600, 600);
+
     // draw debug graphics
     if(bUseVideo)
         movie.drawDebug(2, 506);

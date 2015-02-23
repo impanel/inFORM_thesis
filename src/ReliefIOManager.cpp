@@ -40,6 +40,10 @@ void ReliefIOManager::sendPinHeightToRelief(unsigned char pPinHeightToRelief [RE
 			}
 		}
     }
+
+
+    // store pin height map
+    memcpy(pinHeightToRelief, pPinHeightToRelief, sizeof(unsigned char) * RELIEF_SIZE_X * RELIEF_SIZE_Y);
     
     
     for (unsigned char i = 0; i < NUM_ARDUINOS; i++) { // iterate through each board
