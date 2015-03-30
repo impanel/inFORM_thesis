@@ -285,15 +285,18 @@ void ReliefApplication::guiEvent(ofxUIEventArgs &e)
     {
         ofxUIDropDownList *ddlist = (ofxUIDropDownList *) e.widget;
         vector<ofxUIWidget *> &selected = ddlist->getSelected();
+        //vector<string> playList;
         for(int i = 0; i < selected.size(); i++)
         {
             cout << "SELECTED VIDEO: " << selected[i]->getName() << endl;
+            //playList.push_back(selected[i]->getName());
             movie.playByFilename(selected[i]->getName());
             movie.reset();
             movie.setLooping(true);
             movie.resume();
             cout<<"play"<<endl;
         }
+        //movie.setPlayList(playList);
     }
 }
 

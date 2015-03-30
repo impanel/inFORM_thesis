@@ -120,6 +120,54 @@ void RMovie::reset()
 
 //--------------------------------------------------------------
 
+void RMovie::nextVideo(bool _playIt)
+{
+    nowPlaying.getMoviePath();
+    
+    for (vector<ofVideoPlayer>::iterator it = videos.begin() ; it != videos.end(); ++it) {
+        if(nowPlaying.getMoviePath() == (*it).getMoviePath()) {
+            stop();
+            reset();
+            if(it - videos.begin() >= videos.size() - 1)
+                nowPlaying = videos.at(0);
+            else
+                nowPlaying = *it.operator++();
+            
+            if (_playIt)
+                nowPlaying.play();
+            else
+                nowPlaying.setPaused(true);
+            cout << " now playing video by path " << nowPlaying.getMoviePath();
+        }
+    }
+}
+
+//--------------------------------------------------------------
+
+void RMovie::previousVideo(bool _playIt)
+{
+    nowPlaying.getMoviePath();
+    
+    for (vector<ofVideoPlayer>::iterator it = videos.begin() ; it != videos.end(); ++it) {
+        if(nowPlaying.getMoviePath() == (*it).getMoviePath()) {
+            stop();
+            reset();
+            if(it - videos.begin() <= 0)
+                nowPlaying = videos.at(videos.size() - 1);
+            else
+                nowPlaying = *it.operator--();
+            
+            if (_playIt)
+                nowPlaying.play();
+            else
+                nowPlaying.setPaused(true);
+            cout << " now playing video by path " << nowPlaying.getMoviePath();
+        }
+    }
+}
+
+//--------------------------------------------------------------
+
 void RMovie::drawHeightMap()
 {
     pinHeightImage.begin();
@@ -233,13 +281,15 @@ void RMovie::keyPressed(int key)
     //advance single frame
     if(key == OF_KEY_RIGHT)
     {
-        nowPlaying.nextFrame();
+        //nowPlaying.nextFrame();
+        nextVideo(true);
     }
     
     //previous frame
     if(key == OF_KEY_LEFT)
     {
-        nowPlaying.previousFrame();
+        //nowPlaying.previousFrame();
+        previousVideo(true);
     }
 
 }

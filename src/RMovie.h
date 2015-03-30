@@ -32,6 +32,8 @@ public:
     void resume();
     void stop();
     void reset();
+    void nextVideo(bool _playIt);
+    void previousVideo(bool _playIt);
     void setLooping(bool _set);
     void clearFrames();
     ofFbo getPinHeightImage();
