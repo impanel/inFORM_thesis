@@ -195,7 +195,11 @@ void ReliefApplication::draw(){
     
     // draw debug graphics
     if(bUseVideo)
+    {
         movie.drawDebug(gridOffset0, gridOffset1);
+        string videoInfo = "loop video [l]: ";
+        ofDrawBitmapString(videoInfo + ofToString(movie.getLoopState()), 10, ofGetHeight() - 50);
+    }
     else
         tcp.drawDebug(gridOffset0, gridOffset1, gridSize, gridSize);
     

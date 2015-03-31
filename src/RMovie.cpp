@@ -17,6 +17,7 @@ void RMovie::setup(string _path) {
     filePath = _path;
     listAllVideos();
     pinHeightImage.allocate(RELIEF_SIZE_X, RELIEF_SIZE_Y, GL_RGBA);
+    bLoop = false;
 }
 
 //--------------------------------------------------------------
@@ -77,6 +78,11 @@ void RMovie::playByPath(string _path)
             cout << " now playing video by path " << _path;
         }
     }
+    
+    if(bLoop)
+        nowPlaying.setLoopState(OF_LOOP_NORMAL);
+    else
+        nowPlaying.setLoopState(OF_LOOP_NONE);
 }
 
 //--------------------------------------------------------------
@@ -140,6 +146,11 @@ void RMovie::nextVideo(bool _playIt)
             cout << " now playing video by path " << nowPlaying.getMoviePath();
         }
     }
+    
+    if(bLoop)
+        nowPlaying.setLoopState(OF_LOOP_NORMAL);
+    else
+        nowPlaying.setLoopState(OF_LOOP_NONE);
 }
 
 //--------------------------------------------------------------
@@ -164,6 +175,11 @@ void RMovie::previousVideo(bool _playIt)
             cout << " now playing video by path " << nowPlaying.getMoviePath();
         }
     }
+    
+    if(bLoop)
+        nowPlaying.setLoopState(OF_LOOP_NORMAL);
+    else
+        nowPlaying.setLoopState(OF_LOOP_NONE);
 }
 
 //--------------------------------------------------------------
@@ -268,6 +284,14 @@ vector <string> RMovie::getLoadedVideoPaths() {
 
 //--------------------------------------------------------------
 
+bool RMovie::getLoopState()
+{
+    return bLoop;
+    //return nowPlaying.getLoopState();
+}
+
+//--------------------------------------------------------------
+
 void RMovie::keyPressed(int key)
 {
     if(key == ' ')
@@ -281,15 +305,34 @@ void RMovie::keyPressed(int key)
     //advance single frame
     if(key == OF_KEY_RIGHT)
     {
-        //nowPlaying.nextFrame();
-        nextVideo(true);
+        nowPlaying.nextFrame();
     }
     
     //previous frame
     if(key == OF_KEY_LEFT)
     {
-        //nowPlaying.previousFrame();
+        nowPlaying.previousFrame();
+    }
+    
+    //advance single frame
+    if(key == OF_KEY_DOWN)
+    {
+        nextVideo(true);
+    }
+    
+    //previous frame
+    if(key == OF_KEY_UP)
+    {
         previousVideo(true);
+    }
+
+    if(key == 'l')
+    {
+        bLoop = !bLoop;
+        if(bLoop)
+           nowPlaying.setLoopState(OF_LOOP_NORMAL);
+        else
+           nowPlaying.setLoopState(OF_LOOP_NONE);
     }
 
 }
