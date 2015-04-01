@@ -63,6 +63,20 @@ void RMovie::update(float dt)
     // update our main video, if set
     nowPlaying.update();
     
+    if(bExpMode)
+    {
+        nowPlaying.setLoopState(OF_LOOP_NONE);
+        bLoop = false;
+
+        if(nowPlaying.getIsMovieDone())
+        {
+            cout<<"EXPERIMENT MODE" << endl;
+            nowPlaying.stop();
+            nowPlaying.setFrame(0);
+        }
+    }
+        
+        
     drawHeightMap();
 }
 
@@ -78,11 +92,6 @@ void RMovie::playByPath(string _path)
             cout << " now playing video by path " << _path;
         }
     }
-    
-    if(bLoop)
-        nowPlaying.setLoopState(OF_LOOP_NORMAL);
-    else
-        nowPlaying.setLoopState(OF_LOOP_NONE);
 }
 
 //--------------------------------------------------------------
@@ -146,11 +155,6 @@ void RMovie::nextVideo(bool _playIt)
             cout << " now playing video by path " << nowPlaying.getMoviePath();
         }
     }
-    
-    if(bLoop)
-        nowPlaying.setLoopState(OF_LOOP_NORMAL);
-    else
-        nowPlaying.setLoopState(OF_LOOP_NONE);
 }
 
 //--------------------------------------------------------------
@@ -292,6 +296,12 @@ bool RMovie::getLoopState()
 
 //--------------------------------------------------------------
 
+bool RMovie::getExperimentState()
+{
+    return bExpMode;
+}
+//--------------------------------------------------------------
+
 void RMovie::keyPressed(int key)
 {
     if(key == ' ')
@@ -334,6 +344,12 @@ void RMovie::keyPressed(int key)
         else
            nowPlaying.setLoopState(OF_LOOP_NONE);
     }
+    
+    if(key == 'e') // toggle experiment mode
+    {
+        bExpMode = !bExpMode;
+    }
+
 
 }
 

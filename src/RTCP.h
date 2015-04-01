@@ -32,7 +32,9 @@ public:
     void togglePause();
     void clearFrames();
     ofFbo getPinHeightImage();
-
+    
+    unsigned char* getPixels();
+    void setMovieExportMode(bool _isMovieExport);
     
     ofxTCPServer TCP;
     
@@ -51,13 +53,13 @@ private:
     bool bStop;
     bool bErrorDetected;
     bool bMentionError;
+    bool bEnableMovieRecording;
     int frameIndex;
     int oldCheckSum;
     float elapsedTime;
     float pauseTime;
     
     unsigned char * pixels;
-    unsigned char * sortedPixels;
     string receivedText;
     
     ofFbo pinHeightImage;

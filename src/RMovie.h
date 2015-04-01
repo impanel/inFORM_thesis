@@ -42,6 +42,7 @@ public:
     vector <string>     getLoadedVideoFilenames();
     unsigned char*      getColorPixels();
     bool                getLoopState();
+    bool                getExperimentState();
     unsigned char*      getPixels();
     bool                isPlaying();
     
@@ -62,6 +63,7 @@ private:
     bool bPause;
     bool bStop;
     bool bLoop;
+    bool bExpMode; // mode for experiments
     
     int frameIndex;
     unsigned char * pixels;

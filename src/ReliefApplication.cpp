@@ -75,6 +75,11 @@ void ReliefApplication::setup(){
     
     movie.setup("videos");
     setupGuiMenu();
+    
+    // movie exporter
+    movieExporter.setRecordingArea(0, 0, 100, 100);
+    movieExporter.setup(100, 100); //set video size to 30x30
+    //movieExporter.setPixelSource(tcp.getPixels(), 30 , 30);
 
     bUseVideo = false;
     
@@ -193,6 +198,11 @@ void ReliefApplication::draw(){
         tableSimulation->drawInteractionArea(gridOffset2, gridOffset1, gridSize, gridSize);
     }
     
+    if(bEnableMovieRecorder)
+    {
+        tcp.drawDebug(0, 0, 100, 100);
+    }
+    
     // draw debug graphics
     if(bUseVideo)
     {
@@ -201,7 +211,15 @@ void ReliefApplication::draw(){
         ofDrawBitmapString(videoInfo + ofToString(movie.getLoopState()), 10, ofGetHeight() - 50);
     }
     else
+    {
         tcp.drawDebug(gridOffset0, gridOffset1, gridSize, gridSize);
+        
+        string videoExportInfo = "video export [e]: ";
+        ofDrawBitmapString(videoExportInfo + ofToString(bEnableMovieRecorder), 10, ofGetHeight() - 50);
+        
+        string recordingInfo = "is video being recorded: ";
+        ofDrawBitmapString(recordingInfo + ofToString(movieExporter.isRecording()), 10, ofGetHeight() - 70);
+    }
     
     ofDrawBitmapString(ofToString(ofGetFrameRate()), 10, ofGetHeight() - 30);
 }
@@ -236,10 +254,20 @@ void ReliefApplication::keyPressed(int key){
         inputCanvasRotation = 0;
     }
     
+    if(!bUseVideo)
+        if (key == 'e') {
+            bEnableMovieRecorder = !bEnableMovieRecorder;
+        }
+    
     if (bUseVideo)
+    {
         movie.keyPressed(key);
+    }
     else
+    {
         tcp.keyPressed(key);
+    }
+    
 }
 
 //--------------------------------------------------------------

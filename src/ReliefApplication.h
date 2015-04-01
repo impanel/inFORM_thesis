@@ -10,6 +10,7 @@
 #include "ofxUI.h"
 #include "RTCP.h"
 #include "RMovie.h"
+#include "ofxMovieExporter.h"
 
 //#define RECTDRAW_SIZE 10
 //#define DRAW_OFFSET 300
@@ -63,7 +64,8 @@ public:
     RTCP    tcp;
     RMovie  movie;
     bool bUseVideo;
-    bool drawTableSimulation = true;
+    bool drawTableSimulation = false;
+    bool bEnableMovieRecorder = true;
 
     int gridOffset0 = 2;
     int gridOffset1 = 506;
@@ -79,4 +81,7 @@ public:
     ofxUICanvas *guiMenu;
     ofxUICanvas *simulationToggle;
     TableSimulator *tableSimulation;
+    
+    Apex::ofxMovieExporter movieExporter;
+    
 };

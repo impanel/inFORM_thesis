@@ -9,6 +9,7 @@
 //
 //
 
+#include "ReliefApplication.h"
 #include "RTCP.h"
 
 RTCP::RTCP(){};
@@ -21,9 +22,9 @@ void RTCP::setup(){
     pixels = new unsigned char[size];
     
     //setup the server to listen on 11999
-    TCP.setup(11998);
+    TCP.setup(11995);
     TCP.setMessageDelimiter("\n");
-    
+
     //fill the vector<>
     for(int i = 0; i < size; i++)
     {
@@ -37,6 +38,7 @@ void RTCP::setup(){
     bPause = true;
     bErrorDetected = false;
     bMentionError = false;
+    bEnableMovieRecording = false;
     sequenceFPS = 30;
     oldCheckSum = 999999;
     frameIndex = 0;
@@ -141,7 +143,16 @@ void RTCP::playBack(vector <string> & _strFrames, int & _frameIndex, int _sequen
     {
         if(!bPause)
         {
-            _frameIndex = (int)((ofGetElapsedTimef() - elapsedTime) * _sequenceFPS) % _strFrames.size();
+            if (((ReliefApplication*)ofGetAppPtr())->bEnableMovieRecorder && _frameIndex == _strFrames.size() - 1)
+            {
+                _frameIndex == _strFrames.size();
+                //if sequence is at and end stop recording
+                ((ReliefApplication*)ofGetAppPtr())->movieExporter.stop(); //Quick and dirty
+                ((ReliefApplication*)ofGetAppPtr())->bEnableMovieRecorder = false; //Quick and dirty
+                togglePause();
+            }
+            else
+                _frameIndex = (int)((ofGetElapsedTimef() - elapsedTime) * _sequenceFPS) % _strFrames.size();
         }
         
         if (!bStop) {
@@ -291,6 +302,8 @@ void RTCP::keyPressed(int key)
         {
             cout<<"play"<<endl;
             elapsedTime = ofGetElapsedTimef() - pauseTime;
+            if (((ReliefApplication*)ofGetAppPtr())->bEnableMovieRecorder) //Quick and dirty
+                ((ReliefApplication*)ofGetAppPtr())->movieExporter.record("fromMax", "videos"); //Quick and dirty
         }
     }
     
@@ -334,6 +347,20 @@ ofFbo RTCP::getPinHeightImage()
 }
 
 //--------------------------------------------------------------
+
+unsigned char* RTCP::getPixels()
+{
+    return pixels;
+}
+
+//--------------------------------------------------------------
+
+void RTCP::setMovieExportMode(bool _isMovieExport)
+{
+    bEnableMovieRecording = _isMovieExport;
+}
+
+//-
 
 void RTCP::exit()
 {
