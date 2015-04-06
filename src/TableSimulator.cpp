@@ -24,6 +24,7 @@ void TableSimulator::setup(){
 
     material.setSpecularColor(ofColor(255, 255, 255));
 	material.setShininess(64);
+    
 }
 
 //--------------------------------------------------------------

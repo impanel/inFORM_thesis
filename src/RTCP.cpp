@@ -22,7 +22,7 @@ void RTCP::setup(){
     pixels = new unsigned char[size];
     
     //setup the server to listen on 11999
-    TCP.setup(11995);
+    TCP.setup(11999);
     TCP.setMessageDelimiter("\n");
 
     //fill the vector<>
@@ -314,6 +314,7 @@ void RTCP::keyPressed(int key)
         bStop = !bStop;
         bPause = false;
         elapsedTime = ofGetElapsedTimef();
+        frameIndex = 0;
     }
     
     //toggle stop

@@ -62,6 +62,7 @@ void RMovie::update(float dt)
     
     // update our main video, if set
     nowPlaying.update();
+    setLooping(bLoop);
     
     if(bExpMode)
     {
@@ -70,9 +71,18 @@ void RMovie::update(float dt)
 
         if(nowPlaying.getIsMovieDone())
         {
-            cout<<"EXPERIMENT MODE" << endl;
+            cout<<"EXPORT MODE" << endl;
             nowPlaying.stop();
             nowPlaying.setFrame(0);
+        }
+    }
+    else
+    {
+        // sets the last frame as resting frame so we don't switch to black when one movie is done and the next starts
+        if(nowPlaying.getIsMovieDone())
+        {
+            nowPlaying.stop();
+            nowPlaying.setFrame(nowPlaying.ofBaseVideoPlayer::getTotalNumFrames() - 1);
         }
     }
         
@@ -180,10 +190,6 @@ void RMovie::previousVideo(bool _playIt)
         }
     }
     
-    if(bLoop)
-        nowPlaying.setLoopState(OF_LOOP_NORMAL);
-    else
-        nowPlaying.setLoopState(OF_LOOP_NONE);
 }
 
 //--------------------------------------------------------------
