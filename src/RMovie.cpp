@@ -355,6 +355,11 @@ void RMovie::keyPressed(int key)
     {
         bExpMode = !bExpMode;
     }
+    
+    if(key == 'b') // set playhead to beginning
+    {
+        nowPlaying.setFrame(0);
+    }
 
 
 }

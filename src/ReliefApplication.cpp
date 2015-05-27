@@ -90,7 +90,7 @@ void ReliefApplication::setup(){
 void ReliefApplication::setupGuiMenu()
 {
     guiMenu = new ofxUICanvas;
-    guiMenu->setPosition(gridOffset1, gridOffset1);
+    guiMenu->setPosition(500, 20);
     guiMenu->setName("GUI Menu");
 
     //Toggle for Table Simulation
