@@ -42,7 +42,7 @@ public:
     vector <string>     getLoadedVideoFilenames();
     unsigned char*      getColorPixels();
     bool                getLoopState();
-    bool                getExperimentState();
+    bool                getExportState();
     unsigned char*      getPixels();
     bool                isPlaying();
     

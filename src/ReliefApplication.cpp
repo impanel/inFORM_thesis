@@ -90,7 +90,7 @@ void ReliefApplication::setup(){
 void ReliefApplication::setupGuiMenu()
 {
     guiMenu = new ofxUICanvas;
-    guiMenu->setPosition(500, 20);
+    guiMenu->setPosition(250, 20);
     guiMenu->setName("GUI Menu");
 
     //Toggle for Table Simulation
@@ -117,7 +117,6 @@ void ReliefApplication::update(){
     else
         tcp.update(dt);
 
-    
     renderGraphicsFBO();
     
     renderHeightMapFBO();
@@ -209,6 +208,19 @@ void ReliefApplication::draw(){
         movie.drawDebug(gridOffset0, gridOffset1);
         string videoInfo = "loop video [l]: ";
         ofDrawBitmapString(videoInfo + ofToString(movie.getLoopState()), 10, ofGetHeight() - 50);
+        
+        ofPushStyle();
+        ofSetColor(255);
+        string msg = "[2] video playback/assembly mode";
+        msg += "\n[l] toggle looping video";
+        msg += "\n[b] set the playhead to the beginning of the video";
+        msg += "\n[space] toggle pause video";
+        msg += "\n[DOWN] next video";
+        msg += "\n[UP] previous video";
+        msg += "\n[RIGHT] next frame";
+        msg += "\n[LEFT] previous frame";
+        ofDrawBitmapStringHighlight(msg, 510, ofGetWindowHeight() - 200);
+        ofPopStyle();
     }
     else
     {
@@ -219,9 +231,27 @@ void ReliefApplication::draw(){
         
         string recordingInfo = "is video being recorded: ";
         ofDrawBitmapString(recordingInfo + ofToString(movieExporter.isRecording()), 10, ofGetHeight() - 70);
+        
+        ofPushStyle();
+        ofSetColor(255);
+        string msg = "[1] TCP mode";
+        msg += "\n[e] toggle export video flag";
+        msg += "\n[l] toggle looping video";
+        msg += "\n[s] stop and reset video";
+        msg += "\n[c] clear frame buffer array";
+        msg += "\n[d] delete current frame from frame buffer array";
+        msg += "\n[RIGHT] next frame";
+        msg += "\n[LEFT] previous frame";
+        ofDrawBitmapStringHighlight(msg, 510, ofGetWindowHeight() - 200);
+        ofPopStyle();
     }
     
-    ofDrawBitmapString(ofToString(ofGetFrameRate()), 10, ofGetHeight() - 30);
+    ofPushStyle();
+    ofSetColor(255);
+    string msg = "Press [1] for TCP mode or [2] for Video/Assembly Mode";
+    ofDrawBitmapStringHighlight(msg, 510, ofGetWindowHeight() - 300);
+    ofPopStyle();
+    
 }
 
 //--------------------------------------------------------------

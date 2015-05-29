@@ -302,7 +302,7 @@ bool RMovie::getLoopState()
 
 //--------------------------------------------------------------
 
-bool RMovie::getExperimentState()
+bool RMovie::getExportState()
 {
     return bExpMode;
 }
@@ -351,7 +351,7 @@ void RMovie::keyPressed(int key)
            nowPlaying.setLoopState(OF_LOOP_NONE);
     }
     
-    if(key == 'e') // toggle experiment mode
+    if(key == 'e') // toggle export mode
     {
         bExpMode = !bExpMode;
     }
