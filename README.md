@@ -53,7 +53,7 @@ You can download OF 0.8.0 here
 https://github.com/openframeworks/openFrameworks/tree/0.8.0
 
 
-#M#ake sure the CoreOF.xconfig file is updated
+##Make sure the CoreOF.xconfig file is updated
 
 open /Users/bimster/Sites/OF/of_v0.8.0_osx_release/libs/openFrameworksCompiled/project/osx/CoreOF.xcconfig
 add "$(LIB_FREEIMAGE)" and "$(LIB_FREETYPE)" to the OF_CORE_LIBS
